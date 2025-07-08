@@ -1,8 +1,12 @@
 import { WebSocketServer, WebSocket } from "ws";
 import { Message, User } from "./types";
 import { roomManager } from "./room";
+import dotenv from 'dotenv';
+dotenv.config();
 
-const wss = new WebSocketServer({ port: 3000 });
+const PORT = process.env.PORT || 3000;
+
+const wss = new WebSocketServer({ port: Number(PORT) });
 
 wss.on("connection",(socket:WebSocket)=>{
     socket.on("message",(msg:string)=>{
