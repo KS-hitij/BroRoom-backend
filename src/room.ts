@@ -3,9 +3,12 @@ import { WebSocket } from "ws";
 class RoomManager {
     private rooms: Map<string, User[]> = new Map();
 
-    joinRoom(user: User): void {
+    joinRoom(user: User): void | {status:boolean,message:string} {
         if (!this.rooms.has(user.roomId)) {
-            this.rooms.set(user.roomId, []);
+            return {
+                status: false,
+                message:"No such room exits"
+            };
         }
         this.rooms.get(user.roomId)?.push(user);
     }

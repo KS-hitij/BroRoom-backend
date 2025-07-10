@@ -19,7 +19,15 @@ wss.on("connection",(socket:WebSocket)=>{
                     name: message.payload.name,
                     roomId: message.payload.roomId
                 }
-                roomManager.joinRoom(user);
+                const err = roomManager.joinRoom(user);
+                if(err && err.status==false){
+                    socket.send(JSON.stringify({
+                        type:"error",
+                        payload:{
+                            message:"No such room exits. Check your room id."
+                        }
+                    }))
+                }
                 break;
 
             case "chat":
