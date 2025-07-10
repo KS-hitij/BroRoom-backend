@@ -12,8 +12,19 @@ wss.on("connection",(socket:WebSocket)=>{
     socket.on("message",(msg:string)=>{
         const message:Message = JSON.parse(msg);
         switch (message.type) {
-            case "join":
+            
+            case"host":
                 let user:User = {
+                    socket:socket,
+                    avatar: message.payload.avatar,
+                    name: message.payload.name,
+                    roomId: message.payload.roomId
+                }
+                roomManager.hostRoom(user)
+            break;
+
+            case "join":
+                    user = {
                     socket:socket,
                     avatar: message.payload.avatar,
                     name: message.payload.name,

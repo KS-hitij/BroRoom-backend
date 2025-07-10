@@ -2,6 +2,7 @@ import { Message, User } from "./types";
 import { WebSocket } from "ws";
 class RoomManager {
     private rooms: Map<string, User[]> = new Map();
+    
 
     joinRoom(user: User): void | {status:boolean,message:string} {
         if (!this.rooms.has(user.roomId)) {
@@ -11,6 +12,10 @@ class RoomManager {
             };
         }
         this.rooms.get(user.roomId)?.push(user);
+    }
+
+    hostRoom(user: User): void | {status:boolean,message:string} {
+        this.rooms.set(user.roomId,[user]);
     }
 
     leaveRoom(user: User): void {
