@@ -2,42 +2,51 @@ import { WebSocketServer, WebSocket } from "ws";
 import { Message, User } from "./types";
 import { roomManager } from "./room";
 import dotenv from 'dotenv';
+import http from 'http';
+import express from 'express';
+const app = express();
 dotenv.config();
+
 
 const PORT = process.env.PORT || 3000;
 
-const wss = new WebSocketServer({ port: Number(PORT) });
+const server = http.createServer(app);
+
+const wss = new WebSocketServer({ server:server });
 
 wss.on("connection",(socket:WebSocket)=>{
+    console.log("started");
+    
     socket.on("message",(msg:string)=>{
         const message:Message = JSON.parse(msg);
         switch (message.type) {
             
             case"host":
-                let user:User = {
+                const hostUser:User = {
                     socket:socket,
                     avatar: message.payload.avatar,
                     name: message.payload.name,
                     roomId: message.payload.roomId
                 }
-                roomManager.hostRoom(user)
+                roomManager.hostRoom(hostUser)
             break;
 
             case "join":
-                    user = {
+                    const joinUser:User = {
                     socket:socket,
                     avatar: message.payload.avatar,
                     name: message.payload.name,
                     roomId: message.payload.roomId
                 }
-                const err = roomManager.joinRoom(user);
+                const err = roomManager.joinRoom(joinUser);
                 if(err!=null && err.status==false){
                     socket.send(JSON.stringify({
                         type:"error",
                         payload:{
                             message:"No such room exits. Check your room id."
                         }
-                    }))
+                    }));
+                    socket.close();
                 }
                 break;
 
@@ -46,17 +55,18 @@ wss.on("connection",(socket:WebSocket)=>{
                 break;
 
             case "leave":
-                    user = {
+                    const leaveUser:User = {
                     socket:socket,
                     avatar: message.payload.avatar,
                     name: message.payload.name,
                     roomId: message.payload.roomId
                 }
-                roomManager.leaveRoom(user);
+                roomManager.leaveRoom(leaveUser);
                 break;
 
             case "users":
-                socket.send(JSON.stringify(roomManager.getUsers(message.payload.roomId)));
+                const users = roomManager.getUsers(message.payload.roomId)
+                socket.send(JSON.stringify({type:"users",payload:users}));
                 break;
 
             default:
@@ -67,4 +77,7 @@ wss.on("connection",(socket:WebSocket)=>{
     socket.on("close",()=>{
         roomManager.removeBySocket(socket);
     })
+})
+
+server.listen(PORT,()=>{
 })
