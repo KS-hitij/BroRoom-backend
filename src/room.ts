@@ -4,7 +4,7 @@ class RoomManager {
     private rooms: Map<string, User[]> = new Map();
     
 
-    joinRoom(user: User): void | {status:boolean,message:string} {
+    joinRoom(user: User): null | {status:boolean,message:string} {
         if (!this.rooms.has(user.roomId)) {
             return {
                 status: false,
@@ -12,6 +12,7 @@ class RoomManager {
             };
         }
         this.rooms.get(user.roomId)?.push(user);
+        return null;
     }
 
     hostRoom(user: User): void | {status:boolean,message:string} {

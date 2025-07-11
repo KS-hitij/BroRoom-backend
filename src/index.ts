@@ -31,7 +31,7 @@ wss.on("connection",(socket:WebSocket)=>{
                     roomId: message.payload.roomId
                 }
                 const err = roomManager.joinRoom(user);
-                if(err && err.status==false){
+                if(err!=null && err.status==false){
                     socket.send(JSON.stringify({
                         type:"error",
                         payload:{
